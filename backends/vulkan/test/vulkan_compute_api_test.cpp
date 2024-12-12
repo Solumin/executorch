@@ -1601,9 +1601,8 @@ TEST(VulkanComputeGraphTest, test_simple_shared_objects_with_resize) {
   auto addFn = VK_GET_OP_FN("aten.add.Tensor");
   addFn(graph, {a.value, b.value, kDummyValueRef, c});
 
-  // +2: alpha UBO, broadcast UBO for arithmetic shader
-  // +1: t.sizes_ubo() for arithmetic shader output c
-  expected_vma_allocation_count += 3;
+  // no new allocations if binary op uses push constants
+  expected_vma_allocation_count += 0;
   EXPECT_EQ(get_vma_allocation_count(), expected_vma_allocation_count);
 
   IOValueRef d = graph.add_input_tensor(
@@ -1624,9 +1623,8 @@ TEST(VulkanComputeGraphTest, test_simple_shared_objects_with_resize) {
   auto mulFn = VK_GET_OP_FN("aten.mul.Tensor");
   mulFn(graph, {c, d.value, e});
 
-  // +2: alpha UBO, broadcast UBO for arithmetic shader
-  // +1: t.sizes_ubo() for arithmetic shader output e
-  expected_vma_allocation_count += 3;
+  // no new allocations if binary op uses push constants
+  expected_vma_allocation_count += 0;
   EXPECT_EQ(get_vma_allocation_count(), expected_vma_allocation_count);
 
   IOValueRef out = {};
